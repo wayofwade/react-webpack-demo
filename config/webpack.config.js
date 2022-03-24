@@ -107,7 +107,10 @@ module.exports = function (webpackEnv) {
   const env = getClientEnvironment(paths.publicUrlOrPath.slice(0, -1));
 
   const shouldUseReactRefresh = env.raw.FAST_REFRESH;
-
+  // 对其他loader进行缓存
+  const cacheLoader = {
+    loader: 'cache-loader'
+  }  
   // common function to get style loaders
   const getStyleLoaders = (cssOptions, preProcessor) => {
     const loaders = [
@@ -379,6 +382,7 @@ module.exports = function (webpackEnv) {
             {
               test: /\.svg$/,
               use: [
+                cacheLoader,
                 {
                   loader: require.resolve('@svgr/webpack'),
                   options: {
@@ -407,6 +411,7 @@ module.exports = function (webpackEnv) {
             {
               test: /\.(js|mjs|jsx|ts|tsx)$/,
               include: paths.appSrc,
+              // 对babel-loader
               loader: require.resolve('babel-loader'),
               options: {
                 customize: require.resolve(
@@ -560,7 +565,7 @@ module.exports = function (webpackEnv) {
             // ** STOP ** Are you adding a new loader?
             // Make sure to add the new loader(s) before the "file" loader.
           ],
-        },
+        }
       ].filter(Boolean),
     },
     plugins: [
