@@ -233,6 +233,7 @@ module.exports = function (webpackEnv) {
         : isEnvDevelopment &&
           (info => path.resolve(info.absoluteResourcePath).replace(/\\/g, '/')),
     },
+    // 第二次build的时候，构建时间变快
     cache: {
       type: 'filesystem',
       version: createEnvironmentHash(env.raw),
