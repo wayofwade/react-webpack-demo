@@ -1,5 +1,5 @@
 /**
- * 初始化webpack数据
+ * 初始化webpack数据--备份使用
  */
 'use strict';
 

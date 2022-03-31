@@ -1,5 +1,5 @@
 /**
- * 初始化webpack数据
+ * 最终形态的webpack
  */
 'use strict';
 
@@ -30,6 +30,10 @@ const ForkTsCheckerWebpackPlugin =
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 const createEnvironmentHash = require('./webpack/persistentCache/createEnvironmentHash');
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin; // 分析文件体积工具
+const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");// 分析文件速度工具
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin'); // 压缩js插件
+const smp = new SpeedMeasurePlugin();
 
 // Source maps are resource heavy and can cause out of memory issue for large source files.
 const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
@@ -106,7 +110,10 @@ module.exports = function (webpackEnv) {
   const env = getClientEnvironment(paths.publicUrlOrPath.slice(0, -1));
 
   const shouldUseReactRefresh = env.raw.FAST_REFRESH;
-
+  // 对其他loader进行缓存
+  const cacheLoader = {
+    loader: 'cache-loader'
+  }  
   // common function to get style loaders
   const getStyleLoaders = (cssOptions, preProcessor) => {
     const loaders = [
@@ -188,8 +195,8 @@ module.exports = function (webpackEnv) {
     }
     return loaders;
   };
-
-  return {
+  // const webpackConfig = smp.wrap({
+  const webpackConfig = {
     target: ['browserslist'],
     mode: isEnvProduction ? 'production' : isEnvDevelopment && 'development',
     // Stop compilation early in production
@@ -230,6 +237,7 @@ module.exports = function (webpackEnv) {
         : isEnvDevelopment &&
           (info => path.resolve(info.absoluteResourcePath).replace(/\\/g, '/')),
     },
+    // 第二次build的时候，构建时间变快
     cache: {
       type: 'filesystem',
       version: createEnvironmentHash(env.raw),
@@ -311,6 +319,8 @@ module.exports = function (webpackEnv) {
         .map(ext => `.${ext}`)
         .filter(ext => useTypeScript || !ext.includes('ts')),
       alias: {
+        // 设置别名
+        '@': path.resolve(__dirname, '../src'),
         // Support React Native Web
         // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
         'react-native': 'react-native-web',
@@ -347,6 +357,11 @@ module.exports = function (webpackEnv) {
           test: /\.(js|mjs|jsx|ts|tsx|css)$/,
           loader: require.resolve('source-map-loader'),
         },
+        /* {
+          test: /\.(png|svg|jpg|jpeg|gif|ico)$/,
+          exclude: /node_modules/,
+          use: ['file-loader?name=[name].[ext]'] // ?name=[name].[ext] is only necessary to preserve the original file name
+        }, */
         {
           // "oneOf" will traverse all following loaders until one will
           // match the requirements. When no loader matches it will fall
@@ -379,6 +394,7 @@ module.exports = function (webpackEnv) {
             {
               test: /\.svg$/,
               use: [
+                cacheLoader,
                 {
                   loader: require.resolve('@svgr/webpack'),
                   options: {
@@ -407,6 +423,7 @@ module.exports = function (webpackEnv) {
             {
               test: /\.(js|mjs|jsx|ts|tsx)$/,
               include: paths.appSrc,
+              // 对babel-loader
               loader: require.resolve('babel-loader'),
               options: {
                 customize: require.resolve(
@@ -561,13 +578,28 @@ module.exports = function (webpackEnv) {
             // Make sure to add the new loader(s) before the "file" loader.
           ],
         },
+        /* { test: /\.(jpg|png|gif|bmp|jpeg|ico)$/, use: 'url-loader?limit=7631&name=[hash:8]-[name].[ext]' }, */
+        {
+          test: /\.(jpg|png)$/,
+          use: {
+            loader: "file-loader",
+            options: {
+              esModule: false
+              // name: "[path][name].[hash].[ext]",
+            },
+          },
+        },
       ].filter(Boolean),
     },
     plugins: [
       // Generates an `index.html` file with the <script> injected.
       new HtmlWebpackPlugin(
         Object.assign(
-          {},
+          { 
+            template: './public/index.html',
+            filename: './index.html',
+            favicon: './public/favicon.ico' 
+          },
           {
             inject: true,
             template: paths.appHtml,
@@ -590,6 +622,37 @@ module.exports = function (webpackEnv) {
             : undefined
         )
       ),
+      // new UglifyJsPlugin({}),
+     /*  new BundleAnalyzerPlugin({
+        //  可以是`server`，`static`或`disabled`。
+        //  在`server`模式下，分析器将启动HTTP服务器来显示软件包报告。
+        //  在“静态”模式下，会生成带有报告的单个HTML文件。
+        //  在`disabled`模式下，你可以使用这个插件来将`generateStatsFile`设置为`true`来生成Webpack Stats JSON文件。
+        // analyzerMode: "server",
+        //  将在“服务器”模式下使用的主机启动HTTP服务器。
+        analyzerHost: "127.0.0.1",
+        //  将在“服务器”模式下使用的端口启动HTTP服务器。
+        analyzerPort: 8800,
+        //  路径捆绑，将在`static`模式下生成的报告文件。
+        //  相对于捆绑输出目录。
+        // reportFilename: "report.html",
+        //  模块大小默认显示在报告中。
+        //  应该是`stat`，`parsed`或者`gzip`中的一个。
+        //  有关更多信息，请参见“定义”一节。
+        // defaultSizes: "parsed",
+        // 在默认浏览器中自动打开报告
+        openAnalyzer: false,
+        //  如果为true，则Webpack Stats JSON文件将在bundle输出目录中生成
+        // generateStatsFile: false,
+        //  如果`generateStatsFile`为`true`，将会生成Webpack Stats JSON文件的名字。
+        //  相对于捆绑输出目录。
+        // statsFilename: "stats.json",
+        //  stats.toJson（）方法的选项。
+        //  例如，您可以使用`source：false`选项排除统计文件中模块的来源。
+        //  在这里查看更多选项：https：  //github.com/webpack/webpack/blob/webpack-1/lib/Stats.js#L21
+        // statsOptions: null,
+        // logLevel: "info"
+      }), */
       // Inlines the webpack runtime script. This script is too small to warrant
       // a network request.
       // https://github.com/facebook/create-react-app/issues/5358
@@ -622,13 +685,6 @@ module.exports = function (webpackEnv) {
       // a plugin that prints an error when you attempt to do this.
       // See https://github.com/facebook/create-react-app/issues/240
       isEnvDevelopment && new CaseSensitivePathsPlugin(),
-      isEnvProduction &&
-        new MiniCssExtractPlugin({
-          // Options similar to the same options in webpackOptions.output
-          // both options are optional
-          filename: 'static/css/[name].[contenthash:8].css',
-          chunkFilename: 'static/css/[name].[contenthash:8].chunk.css',
-        }),
       // Generate an asset manifest file with the following content:
       // - "files" key: Mapping of all asset filenames to their corresponding
       //   output file so that tools can pick it up without having to parse
@@ -753,4 +809,12 @@ module.exports = function (webpackEnv) {
     // our own hints via the FileSizeReporter
     performance: false,
   };
+  const CssExtractPlugin = new MiniCssExtractPlugin({
+    // Options similar to the same options in webpackOptions.output
+    // both options are optional
+    filename: 'static/css/[name].[contenthash:8].css',
+    chunkFilename: 'static/css/[name].[contenthash:8].chunk.css',
+  })
+  // isEnvProduction && webpackConfig.plugins.push(CssExtractPlugin)
+  return webpackConfig
 };
