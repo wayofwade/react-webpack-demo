@@ -1,5 +1,5 @@
 /**
- * 最终形态的webpack
+ * 最终形态的webpack1
  */
 'use strict';
 
