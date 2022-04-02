@@ -23,6 +23,10 @@ const paths = require('./paths');
 const modules = require('./modules');
 const getClientEnvironment = require('./env');
 const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin');
+const { FileListPlugin } = require('./file-list-plugin.js'); // 自定义plugins
+
+
+
 const ForkTsCheckerWebpackPlugin =
   process.env.TSC_COMPILE_ON_ERROR === 'true'
     ? require('react-dev-utils/ForkTsCheckerWarningWebpackPlugin')
@@ -199,6 +203,10 @@ module.exports = function (webpackEnv) {
         ? 'source-map'
         : false
       : isEnvDevelopment && 'cheap-module-source-map',
+      devServer: {
+        static: './dist',
+        hot: true, // 热替换
+      },
     // These are the "entry points" to our application.
     // This means they will be the "root" imports that are included in JS bundle.
     entry: paths.appIndexJs,
@@ -246,7 +254,35 @@ module.exports = function (webpackEnv) {
     infrastructureLogging: {
       level: 'none',
     },
-    optimization: {
+    optimization: { // 优化
+      splitChunks: { // 关于Chunks打包
+        chunks: 'async',
+        minSize: 20000,
+        minRemainingSize: 0,
+        minChunks: 1,
+        maxAsyncRequests: 30,
+        maxInitialRequests: 30,
+        enforceSizeThreshold: 50000,
+        cacheGroups: {
+          defaultVendors: {
+            name: "vendors-js",
+            // chunks: "all", // 拆分范围:  三种模式 async (不拆分入口文件)| initial (只拆分入口文件) | all (拆分所有文件) 默认async
+            test: /[\\/]node_modules[\\/]/,
+            priority: -10,
+            reuseExistingChunk: true,
+          },
+          default: {
+            minChunks: 2,
+            priority: -20,
+            reuseExistingChunk: true,
+          },
+          home: {
+            test: /[\\/]home[\\/]/,
+            priority: -10,
+            name: 'home',
+          }
+        },
+      },
       minimize: isEnvProduction,
       minimizer: [
         // This is only used in production mode
@@ -590,6 +626,10 @@ module.exports = function (webpackEnv) {
             : undefined
         )
       ),
+      // 使用任意支持的选项
+      new FileListPlugin({
+        outputFile: 'my-assets.md',
+      }),
       // Inlines the webpack runtime script. This script is too small to warrant
       // a network request.
       // https://github.com/facebook/create-react-app/issues/5358
@@ -742,6 +782,7 @@ module.exports = function (webpackEnv) {
           baseConfig: {
             extends: [require.resolve('eslint-config-react-app/base')],
             rules: {
+              // 'semi': ["error"], // ["error", "always"], // 配置es下划线报错
               ...(!hasJsxRuntime && {
                 'react/react-in-jsx-scope': 'error',
               }),

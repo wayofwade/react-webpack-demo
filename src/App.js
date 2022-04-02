@@ -3,7 +3,9 @@
  */
 import logo from './logo.svg';
 import Z from './Z.png';
+import Z1 from './static/Z.png';
 import './App.css';
+import Home from './home/App.js'
 
 function App() {
   return (
@@ -14,7 +16,7 @@ function App() {
         <p>
           Edit0hhhhh呵呵呵呵呵呵呵 <code>src/App.js</code> and save to reload.
         </p>
-        <img src={require('./Z.png')} className="App-Z" alt="Z" />
+        <img src={Z1} className="App-Z" alt="Z" />
         <img src={'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg'} className="App-Z" alt="Z" />
 
         <a
@@ -26,8 +28,8 @@ function App() {
           Learn React
         </a>
       </header>
+      <Home />
     </div>
   );
 }
-
 export default App;
