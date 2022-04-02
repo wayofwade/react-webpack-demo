@@ -3,7 +3,7 @@
  */
 import logo from './logo.svg';
 import Z from './Z.png';
-import Z1 from './static/Z.png';
+import Z1 from './statics/Z1.png';
 import './App.css';
 import Home from './home/App.js'
 

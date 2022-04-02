@@ -24,9 +24,21 @@ const modules = require('./modules');
 const getClientEnvironment = require('./env');
 const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin');
 const { FileListPlugin } = require('./file-list-plugin.js'); // 自定义plugins
+const CopyWebpackPlugin = require('copy-webpack-plugin'); // 部分文件不打包
+ 
 
-
-
+// 自己后续配置的插件
+const selfPlugins = [
+  // 自定义插件
+  new FileListPlugin({
+    outputFile: 'my-assets.md',
+  }),
+  new CopyWebpackPlugin({
+    patterns: [
+      { from: "src/statics", to: "statics" }, // 不打包静态资源
+    ],
+  })
+]
 const ForkTsCheckerWebpackPlugin =
   process.env.TSC_COMPILE_ON_ERROR === 'true'
     ? require('react-dev-utils/ForkTsCheckerWarningWebpackPlugin')
@@ -276,10 +288,11 @@ module.exports = function (webpackEnv) {
             priority: -20,
             reuseExistingChunk: true,
           },
-          home: {
-            test: /[\\/]home[\\/]/,
+          statics: {
+            chunks: "all", 
+            test: /[\\/]statics[\\/]/,
             priority: -10,
-            name: 'home',
+            name: 'statics',
           }
         },
       },
@@ -600,6 +613,7 @@ module.exports = function (webpackEnv) {
       ].filter(Boolean),
     },
     plugins: [
+      ...selfPlugins,
       // Generates an `index.html` file with the <script> injected.
       new HtmlWebpackPlugin(
         Object.assign(
@@ -626,10 +640,6 @@ module.exports = function (webpackEnv) {
             : undefined
         )
       ),
-      // 使用任意支持的选项
-      new FileListPlugin({
-        outputFile: 'my-assets.md',
-      }),
       // Inlines the webpack runtime script. This script is too small to warrant
       // a network request.
       // https://github.com/facebook/create-react-app/issues/5358
