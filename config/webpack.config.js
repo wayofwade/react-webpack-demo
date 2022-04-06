@@ -218,6 +218,7 @@ module.exports = function (webpackEnv) {
       devServer: {
         static: './dist',
         hot: true, // 热替换
+       // inline: false
       },
     // These are the "entry points" to our application.
     // This means they will be the "root" imports that are included in JS bundle.
@@ -610,6 +611,15 @@ module.exports = function (webpackEnv) {
             // Make sure to add the new loader(s) before the "file" loader.
           ],
         },
+        {
+          test: /\.js$/,
+          loader: 'eslint-loader',
+          enforce: "pre",
+          include: [path.resolve(__dirname, 'src')], // 指定检查的目录
+          options: {                                 // 这里的配置项参数将会被传递到 eslint 的 CLIEngine 
+              formatter: require('eslint-friendly-formatter') // 指定错误报告的格式规范
+          }
+      },
       ].filter(Boolean),
     },
     plugins: [
