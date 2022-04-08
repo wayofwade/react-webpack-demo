@@ -9,7 +9,7 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "webpack/webpack.md",
+            "file": "webpack/webpack名词解析.md",
             "mode": "source"
           }
         }
@@ -68,7 +68,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "webpack/webpack.md",
+                "file": "webpack/webpack名词解析.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -88,6 +88,8 @@
   },
   "active": "35e0d9d5ce9e8b7a",
   "lastOpenFiles": [
-    "webpack/webpack.md"
+    "webpack/webpack名词解析.md",
+    "webpack/webpack.md",
+    "imgs/module.png"
   ]
 }
