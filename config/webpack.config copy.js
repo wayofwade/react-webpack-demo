@@ -1,7 +1,7 @@
 /**
  * 初始化webpack数据--备份使用
  */
-'use strict';
+// 'use strict';
 
 const fs = require('fs');
 const path = require('path');

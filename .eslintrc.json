@@ -1,0 +1,51 @@
+{
+    "env": {
+        "es6": true,
+        "browser": true,
+        // "jest": true,
+        "node": true
+    },
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+     "react",
+     "@typescript-eslint"
+    ],
+    "extends": [
+        "plugin:react/recommended",
+        "standard",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:prettier/recommended"
+    ],
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        // "parser": "@typescript-eslint/parser",
+        "parser": "babel-eslint",
+       //  "ecmaVersion": "latest",
+        "sourceType": "module",
+        "ecmaVersion": 2015
+    },
+
+    "rules": {
+        "react/react-in-jsx-scope": 0,
+        "react/display-name": 0,
+        "react/prop-types": 0,
+        "react-hooks/exhaustive-deps": 0,
+        "react/self-closing-comp": [
+            "warn"
+        ],
+        "no-use-before-define": "off", // 定义前不使用
+        "@typescript-eslint/no-use-before-define": ["error"],
+        "no-console": [
+            2,
+            {
+              "allow": [
+                "warn",
+                "error"
+              ]
+            }
+        ]
+    }
+    
+}

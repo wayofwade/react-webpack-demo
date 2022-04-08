@@ -25,8 +25,9 @@ const getClientEnvironment = require('./env');
 const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin');
 const { FileListPlugin } = require('./file-list-plugin.js'); // 自定义plugins
 const CopyWebpackPlugin = require('copy-webpack-plugin'); // 部分文件不打包
+const ParallelUglifyPlugin = require('webpack-parallel-uglify-plugin'); // 压缩代码和删除console
  
-
+ 
 // 自己后续配置的插件
 const selfPlugins = [
   // 自定义插件
@@ -37,6 +38,21 @@ const selfPlugins = [
     patterns: [
       { from: "src/statics", to: "statics" }, // 不打包静态资源
     ],
+  }),
+  new ParallelUglifyPlugin({
+    workerCount: 3, // 开启几个子进程去并发的执行压缩。默认是当前运行电脑的cPU核数减去1
+    uglifyJs: {
+      output: {
+        beautify: false, //不需要格式化
+        comments: false, //不保留注释
+      },
+      compress: {
+        warnings: false, //在Uglify]s除没有用到的代码时不输出警告
+        drop_console: true, //删除所有的console语句，可以兼容ie浏览器
+        collapse_vars: true, //内嵌定义了但是只用到一次的变量
+        reduce_vars: true, //取出出现多次但是没有定义成变量去引用的静态值
+      }
+    },
   })
 ]
 const ForkTsCheckerWebpackPlugin =
