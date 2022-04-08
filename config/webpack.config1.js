@@ -30,10 +30,10 @@ const ForkTsCheckerWebpackPlugin =
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 const createEnvironmentHash = require('./webpack/persistentCache/createEnvironmentHash');
-const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin; // 分析文件体积工具
+// const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin; // 分析文件体积工具
 const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");// 分析文件速度工具
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin'); // 压缩js插件
-const smp = new SpeedMeasurePlugin();
+// const UglifyJsPlugin = require('uglifyjs-webpack-plugin'); // 压缩js插件
+// const smp = new SpeedMeasurePlugin();
 
 // Source maps are resource heavy and can cause out of memory issue for large source files.
 const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';

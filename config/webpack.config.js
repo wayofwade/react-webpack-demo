@@ -295,7 +295,7 @@ module.exports = function (webpackEnv) {
         cacheGroups: {
           defaultVendors: {
             name: "vendors-js",
-            // chunks: "all", // 拆分范围:  三种模式 async (不拆分入口文件)| initial (只拆分入口文件) | all (拆分所有文件) 默认async
+            chunks: "all", // 拆分范围:  三种模式 async (不拆分入口文件)| initial (只拆分入口文件) | all (拆分所有文件) 默认async
             test: /[\\/]node_modules[\\/]/,
             priority: -10,
             reuseExistingChunk: true,
@@ -310,7 +310,7 @@ module.exports = function (webpackEnv) {
             test: /[\\/]statics[\\/]/,
             priority: -10,
             name: 'statics',
-          }
+          },
         },
       },
       minimize: isEnvProduction,
@@ -386,6 +386,7 @@ module.exports = function (webpackEnv) {
           'scheduler/tracing': 'scheduler/tracing-profiling',
         }),
         ...(modules.webpackAliases || {}),
+        // '@i18n':paths.i18nSrc,
       },
       plugins: [
         // Prevents users from importing files from outside of src/ (or node_modules/).
