@@ -28,7 +28,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin'); // 部分文件不打�
 const ParallelUglifyPlugin = require('webpack-parallel-uglify-plugin'); // 压缩代码和删除console
  
  
-// 自己后续配置的插件
+// 新增的-自己后续配置的插件
 const selfPlugins = [
   // 自定义插件
   new FileListPlugin({
@@ -36,7 +36,7 @@ const selfPlugins = [
   }),
   new CopyWebpackPlugin({
     patterns: [
-      { from: "src/statics", to: "statics" }, // 不打包静态资源
+      { from: "src/statics", to: "static-file" }, // 不打包静态资源
     ],
   }),
   new ParallelUglifyPlugin({
@@ -637,6 +637,21 @@ module.exports = function (webpackEnv) {
               formatter: require('eslint-friendly-formatter') // 指定错误报告的格式规范
           }
       },
+      	{ // 新增的
+          test: /\.(png|jpg|jpeg|gif)$/,
+          use: {
+              loader: 'url-loader',
+              // 6kb 以下的图片，都用Base64编码
+              options: {
+                  // 超过limit大小的图片，默认用file-loaderc处理，因此file-loader必须安装
+                  limit: 6 * 1024,
+                  // 是file-loader打包的输出的文件
+                  outputPath: './static-img',
+                  // 加上，才能用 html-withimg-loader，否则，会报错
+                  esModule: false
+              }
+          }
+        }
       ].filter(Boolean),
     },
     plugins: [
